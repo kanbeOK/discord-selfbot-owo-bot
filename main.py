@@ -1,6 +1,6 @@
 import discum_c844aef
 import time
-import multiprocessing
+import Threading
 import json
 import random
 import re
