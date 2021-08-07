@@ -1,190 +1,198 @@
-import discum_c844aef
-import time
-import Threading
-import json
-import random
-import re
-import os
-try:
-  from tkinter import messagebox
-  use_terminal=False
-except:
-  use_terminal=True
-once=False
-wbm=[12,16]
-update = 0
-class bot:
-  owoid=408785106942164992 #user id of the owo bot
+import tkinter as tk
+import tkinter.font as tkFont
+from tkinter import messagebox
+import cheat
+class App:
+    def __init__(self, root):
+        #setting title
+        root.title("Choose login method")
+        #setting window size
+        width=240
+        height=100
+        screenwidth = root.winfo_screenwidth()
+        screenheight = root.winfo_screenheight()
+        alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
+        root.geometry(alignstr)
+        root.resizable(width=False, height=False)
 
-  with open('settings.json', "w+") as file:
-    try:
-      data = json.load(file)
-      token = data["token"]
-      channel = data["channel"]
-      proxy = data["proxy"]
-      proxyserver = data["proxy_"]["server"]
-      proxyport = data["proxy_"]["port"]
-    except:
-      temp={}
-      temp["token"] = input("please enter your dc token for once: ")
-      temp["channel"] = input("please enter the id of the channel: ")
-      while True:
-        temp["proxy"] = input("will you use proxy? [YES/NO]")
-        temp["proxy_"] = {}
-        if temp["proxy"].upper() == "YES":
-          temp["proxy_"]["server"] = input("Proxy server: ")
-          temp["proxy_"]["port"] = input("Proxy server port: ")
-          break
-        if temp["proxy"].upper() == "NO":
-          temp["proxy_"]["server"] = None
-          temp["proxy_"]["port"] = None
-          break
-      json.dump(temp, file)
-      token = temp["token"]
-      channel = temp["channel"]
-      proxy = temp["proxy"]
-      proxyserver = temp["proxy_"]["server"]
-      proxyport = temp["proxy_"]["port"]
-  commands=[
-    "owo hunt",
-    "owo hunt",
-    "owo battle"
-    ]
-  class color:
-    purple = '\033[95m'
-    okblue = '\033[94m'
-    okcyan = '\033[96m'
-    okgreen = '\033[92m'
-    warning = '\033[93m'
-    fail = '\033[91m'
-    reset = '\033[0m'
-    bold = '\033[1m'
-    underline = '\033[4m'
-    if os.name == "nt":
-      purple = ''
-      okblue = ''
-      okcyan = ''
-      okgreen = ''
-      warning = ''
-      fail = ''
-      reset = ''
-      bold = ''
-      underline = ''
-def at():
-  return f'\033[0;43m{time.strftime("%d %b %Y %H:%M:%S", time.localtime())}\033[0;21m'
-def report_error(content):
-  if use_terminal:
-    print(at(), content)
-  else:
-    messagebox.showerror("OWO bot cheat", content)
-client=discum_c844aef.Client(token=bot.token,proxy_host=bot.proxyserver, proxy_port=bot.proxyport, log=False)
-def issuechecker():
-  msgs=client.getMessages(str(bot.channel), num=10)
-  msgs=json.loads(msgs.text)
-  owodes=0
-  for msgone in msgs:
-    if msgone['author']['id']==str(bot.owoid):
-      owodes=owodes+1
-      msgonec=msgone['content']
-      if "(2/5)" in str(msgonec):
-          return "exit"
-      if 'banned' in msgonec:
-          print(f'{at()}{bot.color.fail} !!! [BANNED] !!! {bot.color.reset} your account have been banned from owo bot please open a issue on https://github.com/sudo-do/discord-selfbot-owo-bot/')
-          return "exit"
-      if 'complete your captcha' in msgonec:
-          print(f'{at()}{bot.color.warning} !! [CAPTCHA] !! {bot.color.reset} CAPTCHA   ACTION REQUİRED {msgonec[-6:]}')
-          return "exit"
-  if not owodes:
-    return "exit"
-def security():
-        if issuechecker() == "exit":
-          report_error("Ban-security triggered, answer the captcha")
-          exit()
-def runner():
-        global wbm
-        command=random.choice(bot.commands)
-        command2=random.choice(bot.commands)
-        client.typingAction(str(bot.channel))
-        client.sendMessage(str(bot.channel), command)
-        print(f"{at()}{bot.color.okgreen} [SENT] {bot.color.reset} {command}")
-        if not command2==command:
-          client.typingAction(str(bot.channel))
-          time.sleep(1)
-          client.sendMessage(str(bot.channel), command2)
-          print(f"{at()}{bot.color.okgreen} [SENT] {bot.color.reset} {command2}")
-        time.sleep(random.randint(wbm[0],wbm[1]))
-def owopray():
-  client.sendMessage(str(bot.channel), "owo pray")
-  print(f"{at()}{bot.color.okgreen} [SENT] {bot.color.reset} owo pray")
-def gems():
-  client.typingAction(str(bot.channel))
-  time.sleep(2)
-  client.sendMessage(str(bot.channel), "owo inv")
-  print(f"{at()}{bot.color.okgreen} [SENT] {bot.color.reset} owo inv")
-  time.sleep(5)
-  msgs=client.getMessages(str(bot.channel), num=5)
-  msgs=json.loads(msgs.text)
-  inv = 0
-  for msgone in msgs:
-    if msgone['author']['id']==str(bot.owoid) and 'Inventory' in msgone['content']:
-      inv=re.findall(r'`(.*?)`', msgone['content'])
-  if not inv:
-    security()
-  else:
-    if '50' in inv:
-      client.sendMessage(str(bot.channel), "owo lb all")
-      print(f"{at()}{bot.color.okgreen} [SENT] {bot.color.reset} owo lb all")
-      time.sleep(10)
-      gems()
-      return
-    for item in inv:
-      try: 
-        if int(item) > 100:
-          inv.pop(inv.index(item)) #weapons
-      except: #backgounds etc
-        inv.pop(inv.index(item))
-    tier = [[],[],[]]
-    print(f"{at()}{bot.color.okblue} [INFO] {bot.color.reset} Found {len(inv)} gems Inventory")
-    for gem in inv:
-      gem =int(gem)
-      if 50 < gem < 60:
-        tier[0].append(gem)
-      elif 60 < gem < 70:
-        tier[1].append(gem)
-      elif 70 < gem < 80:
-        tier[2].append(gem)
-    for level in range(0,3):
-      if not len(tier[level]) == 0:
-        client.sendMessage(str(bot.channel), "owo use "+str(max(tier[level])))
-        print(f"{at()}{bot.color.okgreen} [SENT] {bot.color.reset} owo use {str(max(tier[level]))}")
-        time.sleep(6)
-def loopie():
-  x=True
-  pray = 0
-  gem=pray
-  main=time.time()
-  while x:
-      runner()
-      if time.time() - pray > random.randint(300, 500):
-        security()
-        owopray()
-        pray=time.time()
-      if time.time() - gem > random.randint(500, 1000):
-        security()
-        gems()
-        gem=time.time()
-      
-      if time.time() - main > random.randint(1000, 1800):
-        time.sleep(random.randint(150, 300))
-        security ()
-        main=time.time()
-@client.gateway.command
-def defination1(resp):
-  global once
-  if not once:
-    once=True
-    if __name__ == '__main__':
-      lol=multiprocessing.Process(target=loopie)
-      lol.run()
-print(bot.token)
-client.gateway.run()
+        token_button=tk.Button(root)
+        token_button["bg"] = "#efefef"
+        ft = tkFont.Font(family='Times',size=10)
+        token_button["font"] = ft
+        token_button["fg"] = "#000000"
+        token_button["justify"] = "center"
+        token_button["text"] = "Token"
+        token_button.place(x=10,y=50,width=100,height=30)
+        token_button["command"] = lambda: self.token_button_command(root)
+
+        token_button=tk.Button(root)
+        token_button["bg"] = "#efefef"
+        ft = tkFont.Font(family='Times',size=10)
+        token_button["font"] = ft
+        token_button["fg"] = "#000000"
+        token_button["justify"] = "center"
+        token_button["text"] = "email + pass"
+        token_button.place(x=130,y=50,width=100,height=30)
+        token_button["command"] = lambda: self.mail_button_command(root)
+
+        label=tk.Label(root)
+        ft = tkFont.Font(family='Times',size=10)
+        label["font"] = ft
+        label["fg"] = "#333333"
+        label["justify"] = "center"
+        label["text"] = "Choose login method"
+        label.place(x=0,y=10,width=242,height=30)
+
+    def mail_button_command(self, root):
+        if __name__ == "__main__":
+            root.destroy()
+            root = tk.Tk()
+            app = auth.email(root)
+            root.mainloop()
+
+
+    def token_button_command(self, root):
+        if __name__ == "__main__":
+            root.destroy()
+            root = tk.Tk()
+            app = auth.token(root)
+            root.mainloop()
+class auth:
+    email, password, token = "", "", ""
+    def login(method, root, i1, i2 = ""):
+        print(method, root, i1, i2)
+        root.withdraw()
+        newline = "\n"
+        print(f"login with {'token' if method else 'email and password'} \n { 'token: '+i1 if method else 'email: '+ i1 + newline +' password: '+i2} ")
+        if cheat.check_creditials(method, i1, i2) == False:
+            messagebox.showerror("Login Failed", "Cannot login to the account, possible fixes: \n - Allways use Token Auth\n  - be sure token is valid\n - Be sure email and password is correct\n - Be sure you have internet connection")
+            root.iconify()
+            # this part doesn't work
+            # point is show the window, it's hiding on bottom
+
+            # {
+            root.lift()
+            root.after(1, lambda: root.focus_force())
+            # }
+
+        else:
+            messagebox.showerror("logged in", "success")
+            root.destroy()
+    class email:
+        def __init__(self, root):
+            root.title("Login")
+            width=280
+            height=150
+            px, py, pb = 20,20,25
+            screenwidth = root.winfo_screenwidth()
+            screenheight = root.winfo_screenheight()
+            alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
+            root.geometry(alignstr)
+            root.resizable(width=False, height=False)
+
+            email_field=tk.Entry(root, textvariable=auth.email)
+            email_field["bg"] = "#999999"
+            email_field["borderwidth"] = "1px"
+            ft = tkFont.Font(family='Times',size=10)
+            email_field["font"] = ft
+            email_field["fg"] = "#333333"
+            email_field["justify"] = "center"
+            email_field["text"] = "email"
+            email_field["relief"] = "sunken"
+            email_field.place(x=px,y=py,width=width-px*2,height=pb)
+
+            password_field=tk.Entry(root, textvariable=auth.password)
+            password_field["bg"] = "#999999"
+            password_field["borderwidth"] = "1px"
+            password_field["cursor"] = "watch"
+            ft = tkFont.Font(family='Times',size=10)
+            password_field["font"] = ft
+            password_field["fg"] = "#333333"
+            password_field["justify"] = "center"
+            password_field["text"] = "Password"
+            password_field["relief"] = "sunken"
+            password_field.place(x=px,y=py+pb*2,width=width-px*2,height=pb)
+
+            loginbutton=tk.Button(root)
+            loginbutton["bg"] = "#90f090"
+            ft = tkFont.Font(family='Times',size=10)
+            loginbutton["font"] = ft
+            loginbutton["fg"] = "#000000"
+            loginbutton["justify"] = "center"
+            loginbutton["text"] = "Login"
+            loginbutton.place(x=190,y=pb*4+10,width=80,height=30)
+            loginbutton["command"] = lambda: auth.login(0, root, email_field.get(), password_field.get())
+
+            changemethodbutton=tk.Button(root)
+            changemethodbutton["bg"] = "#932a00"
+            ft = tkFont.Font(family='Times',size=10)
+            changemethodbutton["font"] = ft
+            changemethodbutton["fg"] = "#000000"
+            changemethodbutton["justify"] = "center"
+            changemethodbutton["text"] = "Use token"
+            changemethodbutton.place(x=95,y=pb*4+10,width=80,height=30)
+            changemethodbutton["command"] = lambda: self.method(root)
+        def method(self, root):
+            if __name__ == "__main__":
+                root.destroy()
+                root = tk.Tk()
+                app = auth.token(root)
+                root.mainloop()
+        def login(self):
+            print("login action")
+
+
+    class token:
+        def __init__(self, root):
+            root.title("Login")
+            width=280
+            height=150
+            px, py, pb = 20,20,25
+            screenwidth = root.winfo_screenwidth()
+            screenheight = root.winfo_screenheight()
+            alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
+            root.geometry(alignstr)
+            root.resizable(width=False, height=False)
+
+            token_field=tk.Entry(root, textvariable=auth.token)
+            token_field["bg"] = "#999999"
+            token_field["borderwidth"] = "1px"
+            ft = tkFont.Font(family='Times',size=10)
+            token_field["font"] = ft
+            token_field["fg"] = "#333333"
+            token_field["justify"] = "center"
+            token_field["text"] = "token"
+            token_field["relief"] = "sunken"
+            token_field.place(x=px,y=py,width=width-px*2,height=pb)
+
+            loginbutton=tk.Button(root)
+            loginbutton["bg"] = "#90f090"
+            ft = tkFont.Font(family='Times',size=10)
+            loginbutton["font"] = ft
+            loginbutton["fg"] = "#000000"
+            loginbutton["justify"] = "center"
+            loginbutton["text"] = "Login"
+            loginbutton.place(x=190,y=pb*4+10,width=80,height=30)
+            loginbutton["command"] = lambda: auth.login(1, root, token_field.get())
+
+            changemethodbutton=tk.Button(root)
+            changemethodbutton["bg"] = "#932a00"
+            ft = tkFont.Font(family='Times',size=10)
+            changemethodbutton["font"] = ft
+            changemethodbutton["fg"] = "#000000"
+            changemethodbutton["justify"] = "center"
+            changemethodbutton["text"] = "Use Email"
+            changemethodbutton.place(x=95,y=pb*4+10,width=80,height=30)
+            changemethodbutton["command"] = lambda: self.method(root)
+
+        def method(self, root):
+            if __name__ == "__main__":
+                root.destroy()
+                root = tk.Tk()
+                app = auth.email(root)
+                root.mainloop()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = App(root)
+    root.mainloop()
