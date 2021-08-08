@@ -1,5 +1,9 @@
-import tkinter as tk
-import tkinter.font as tkFont
+try:
+  import tkinter as tk
+  import tkinter.font as tkFont
+  gui = 1
+except:
+  gui = 0
 from tkinter import messagebox
 import cheat, json
 class App:
