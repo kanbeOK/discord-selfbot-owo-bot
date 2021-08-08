@@ -1,7 +1,7 @@
 import tkinter as tk
 import tkinter.font as tkFont
 from tkinter import messagebox
-import cheat
+import cheat, json
 class App:
     def __init__(self, root):
         #setting title
@@ -64,7 +64,9 @@ class auth:
         root.withdraw()
         newline = "\n"
         print(f"login with {'token' if method else 'email and password'} \n { 'token: '+i1 if method else 'email: '+ i1 + newline +' password: '+i2} ")
-        if cheat.check_creditials(method, i1, i2) == False:
+        CH_RESP = cheat.check_creditials(method, i1, i2)
+        print (CH_RESP)
+        if CH_RESP.status_code != 200:
             messagebox.showerror("Login Failed", "Cannot login to the account, possible fixes: \n - Allways use Token Auth\n  - be sure token is valid\n - Be sure email and password is correct\n - Be sure you have internet connection")
             root.iconify()
             # this part doesn't work
@@ -76,8 +78,8 @@ class auth:
             # }
 
         else:
-            messagebox.showerror("logged in", "success")
             root.destroy()
+            cheat.run(method, i1, i2)
     class email:
         def __init__(self, root):
             root.title("Login")
