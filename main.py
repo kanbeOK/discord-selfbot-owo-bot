@@ -1,10 +1,10 @@
 try:
   import tkinter as tk
   import tkinter.font as tkFont
+  #from tkinter import messagebox
   gui = 1
 except:
   gui = 0
-from tkinter import messagebox
 import cheat, json
 class App:
     def __init__(self, root):
