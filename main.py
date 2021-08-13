@@ -70,7 +70,8 @@ class auth:
         print(f"login with {'token' if method else 'email and password'} \n { 'token: '+i1 if method else 'email: '+ i1 + newline +' password: '+i2} ")
         CH_RESP = cheat.check_creditials(method, i1, i2)
         print (CH_RESP)
-        if CH_RESP.status_code != 200:
+        if CH_RESP != False or CH_RESP != None:
+          if CH_RESP.status_code != 200:
             messagebox.showerror("Login Failed", "Cannot login to the account, possible fixes: \n - Allways use Token Auth\n  - be sure token is valid\n - Be sure email and password is correct\n - Be sure you have internet connection")
             root.iconify()
             # this part doesn't work
@@ -81,7 +82,7 @@ class auth:
             root.after(1, lambda: root.focus_force())
             # }
 
-        else:
+          else:
             root.destroy()
             cheat.run(method, i1, i2)
     class email:
